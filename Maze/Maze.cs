@@ -18,6 +18,11 @@ public class Maze
 
     public char[,] Generate(int length, int width)
     {
+        if (length < 3 || width < 3)
+        {
+            throw new ArgumentException("Maze dimensions must be at least 3x3.");
+        }
+
         var maze = new char[length, width];
 
         Fill(maze);
@@ -25,6 +30,9 @@ public class Maze
         var entrance = SetEntrance(maze);
         var exit = SetExit(maze, entrance);
         var visited = new bool[length, width];
+
+        PrintMaze(maze);
+        Console.WriteLine();
 
         BuildMaze(maze, entrance, visited);
 
@@ -39,9 +47,6 @@ public class Maze
 
         visited[current.X, current.Y] = true;
 
-        var length = maze.GetLength(0);
-        var width = maze.GetLength(1);
-
         var directions = GetShuffledDirections();
 
         foreach (var (dx, dy) in directions)
@@ -51,21 +56,64 @@ public class Maze
             var nextX = current.X + dx;
             var nextY = current.Y + dy;
 
-            if (nextX >= 0 && nextX < length &&
-                nextY >= 0 && nextY < width &&
-                (maze[nextX, nextY] == Wall || maze[nextX, nextY] == Exit) &&
-                (!(x == 0 || x == length - 1 || y == 0 || y == width - 1) || maze[x, y] == Exit))
+            if (IsValidPosition((nextX, nextY), (x, y), maze))
             {
                 if (maze[x, y] != Exit)
                 {
                     maze[x, y] = Passage;
                 }
 
-                // PrintMaze(maze);
-                // Console.WriteLine();
+                PrintMaze(maze);
+                Console.WriteLine();
                 BuildMaze(maze, (x, y), visited);
             }
         }
+    }
+
+    private bool IsValidPosition((int x, int y) next, (int x, int y) pos, char[,] maze)
+    {
+        // out of bounds
+        if (!(next.x >= 0 && next.x < maze.GetLength(0) &&
+                next.y >= 0 && next.y < maze.GetLength(1)))
+        {
+            return false;
+        }
+
+        // pos isnt on the boundary
+        if (!(pos.x > 0 && pos.x < maze.GetLength(0) - 1 &&
+                pos.y > 0 && pos.y < maze.GetLength(1) - 1))
+        {
+            return false;
+        }
+        // next is not a wall
+        if (maze[next.x, next.y] != Wall && maze[next.x, next.y] != Exit)
+        {
+            return false;
+        }
+
+        if (maze[next.x, next.y] == Exit)
+        {
+            return true;
+        }
+
+        var dx = Math.Abs(next.x - pos.x);
+        var dy = Math.Abs(next.y - pos.y);
+
+        if (dx == 1 &&
+            !((maze[pos.x, pos.y - 1] == Wall || maze[pos.x, pos.y - 1] == Exit) &&
+            (maze[pos.x, pos.y + 1] == Wall || maze[pos.x, pos.y + 1] == Exit)))
+        {
+            return false; // Horizontal passage
+        }
+
+        if (dy == 1 &&
+            !((maze[pos.x - 1, pos.y] == Wall || maze[pos.x - 1, pos.y] == Exit) &&
+            (maze[pos.x + 1, pos.y] == Wall || maze[pos.x + 1, pos.y] == Exit)))
+        {
+            return false; // Vertical passage
+        }
+
+        return true;
     }
 
     private (int dx, int dy)[] GetShuffledDirections()
