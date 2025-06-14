@@ -58,19 +58,13 @@ public class Maze
 
         foreach (var (dx, dy) in directions)
         {
-            var x = current.X + dx / 2;
-            var y = current.Y + dy / 2;
-            var nextX = current.X + dx;
-            var nextY = current.Y + dy;
+            (int x, int y) passage = (current.X + dx / 2, current.Y + dy / 2);
+            (int X, int Y) next = (current.X + dx, current.Y + dy);
 
-            if (IsValidPosition((nextX, nextY), (x, y), maze))
+            if (IsValidPosition(next, passage, maze))
             {
-                if (maze[x, y] != Exit)
-                {
-                    maze[x, y] = Passage;
-                }
-
-                BuildMaze(maze, (x, y), visited);
+                maze[passage.x, passage.y] = Passage;
+                BuildMaze(maze, passage, visited);
             }
         }
     }
@@ -121,6 +115,14 @@ public class Maze
         return true;
     }
 
+    /// <summary>
+    /// Shuffles the directions array to ensure that the maze is generated in a random manner.
+    /// </summary>
+    /// <returns>arr of shuffled directions</returns>
+    /// <remarks>
+    /// Please, pay attention that this method changes the state of maze every time,
+    /// so <param name="_directions"/> shouldnt be ever expected to have particualr order.
+    /// </remarks>
     private (int dx, int dy)[] GetShuffledDirections()
     {
         for (int i = _directions.Length - 1; i > 0; i--)
