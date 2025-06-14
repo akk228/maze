@@ -17,6 +17,11 @@ int GetDimension(string message)
         var input = Console.ReadLine();
         if (int.TryParse(input, out var dimension) && dimension > 0)
         {
+            if (dimension < 3)
+            {
+                Console.WriteLine("Dimension should be at least 3. Please try again.");
+                continue;
+            }
             return dimension;
         }
         Console.WriteLine("Invalid input. Please enter a positive integer. Or press Ctrl+C to exit.");   
