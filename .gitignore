@@ -1,0 +1,61 @@
+# .NET Core
+bin/
+obj/
+out/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+
+# Build results
+*.dll
+*.exe
+*.app
+*.log
+
+# NuGet
+*.nupkg
+.nuget/
+packages/
+project.lock.json
+project.fragment.lock.json
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# User-specific files
+*.swp
+*.bak
+*.tmp
+
+# Rider
+.idea/
+
+# DotCover
+*.dotCover
+
+# Others
+*.vspscc
+*.vssscc
+*.dbmdl
+*.pdb
+
+# Local history for Visual Studio
+.localhistory/
+
+# Test Results
+TestResults/
+*.TestResults
+
+# Publish
+publish/
+wwwroot/
+
+# Entity Framework
+Migrations/
+
+# Azure Pipelines
+.azure-pipelines/
