@@ -10,10 +10,10 @@ public class Maze
     private Random _random = new Random();
     private (int dx, int dy)[] _directions =
     {
-        (0, 2),   // Right
-        (2, 0),   // Down
-        (0, -2),  // Left
-        (-2, 0)   // Up
+        (0, 2),
+        (2, 0),
+        (0, -2),
+        (-2, 0)
     };
 
     public char[,] Generate(int length, int width)
@@ -28,16 +28,23 @@ public class Maze
         Fill(maze);
 
         var entrance = SetEntrance(maze);
-        var exit = SetExit(maze, entrance);
         var visited = new bool[length, width];
 
-        PrintMaze(maze);
-        Console.WriteLine();
-
         BuildMaze(maze, entrance, visited);
+        SetExit(maze);
 
         return maze;
     }
+
+
+    /// <summary>
+    /// Builds maze such that it recursively carves passages from the entrance.
+    /// making sure that pasage always has thickness of 1 menaing that if a cell is a passage
+    /// it has to be surrounded by walls on all sides except for the entrance and exit.
+    /// </summary>
+    /// <param name="maze"></param>
+    /// <param name="current"></param>
+    /// <param name="visited"></param>
     private void BuildMaze(char[,] maze, (int X, int Y) current, bool[,] visited)
     {
         if (visited[current.X, current.Y])
@@ -63,8 +70,6 @@ public class Maze
                     maze[x, y] = Passage;
                 }
 
-                PrintMaze(maze);
-                Console.WriteLine();
                 BuildMaze(maze, (x, y), visited);
             }
         }
@@ -154,17 +159,53 @@ public class Maze
         return entrance;
     }
 
-    private (int X, int Y) SetExit(char[,] maze, (int X, int Y) entrance)
+    private void SetExit(char[,] maze)
     {
-        // Ensure exit is not at the same position as entrance
-        var exit = SetEndPoint(maze.GetLength(0), maze.GetLength(1));
-        while (exit.X == entrance.X && exit.Y == entrance.Y)
-        {
-            exit = SetEndPoint(maze.GetLength(0), maze.GetLength(1));
-        }
-        maze[exit.X, exit.Y] = Exit;
+        var potentialexits = new List<(int X, int Y)>();
+        var maxX = maze.GetLength(0) - 1;
+        var maxY = maze.GetLength(1) - 1;
 
-        return exit;
+        for (var y = 0; y <= maxY; y++)
+        {
+            if (maze[0, y] == Entrance || maze[maxX, y] == Entrance)
+            {
+                continue;
+            }
+
+            if (maze[1, y] != Wall)
+            {
+                potentialexits.Add((0, y)); // Top wall
+            }
+            if (maze[maxX - 1, y] != Wall)
+            {
+                potentialexits.Add((maxX, y)); // Bottom wall
+            }
+        }
+
+        for (var x = 0; x <= maxX; x++)
+        {
+            if (maze[x, 0] == Entrance || maze[x, maxY] == Entrance)
+            {
+                continue;
+            }
+            if (maze[x, 1] != Wall)
+            {
+                potentialexits.Add((x, 0)); // Left wall
+            }
+            if (maze[x, maxY - 1] != Wall)
+            {
+                potentialexits.Add((x, maxY)); // Right wall
+            }
+        }
+        // never gonna happen
+        if (potentialexits.Count == 0)
+        {
+            throw new InvalidOperationException("No valid exit found.");
+        }
+
+        var exit = potentialexits[_random.Next(potentialexits.Count)];
+
+        maze[exit.X, exit.Y] = Exit;
     }
 
     private (int X, int Y) SetEndPoint(int length, int width)
