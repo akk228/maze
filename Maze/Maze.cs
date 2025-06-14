@@ -4,7 +4,7 @@ public class Maze
 {
     private const char Entrance = 'I';
     private const char Exit = 'O';
-    private const char Wall = 'X';
+    private const char Wall = '\u25A0';
     private const char Passage = '.';
 
     private Random _random = new Random();
@@ -233,6 +233,7 @@ public class Maze
     
     public static void PrintMaze(char[,] maze)
     {
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
         for (var x = 0; x < maze.GetLength(0); x++)
         {
             for (var y = 0; y < maze.GetLength(1); y++)
